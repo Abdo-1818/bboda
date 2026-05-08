@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>محرك بحث الطقس</title>
+    <style>
+        :root {
+            --bg: #ffffff;
+            --text: #1a1a1a;
+            --card-bg: #0a0a0a;
+            --card-text: #f0f0f0;
+            --border: #1a1a1a;
+            --gray-light: #e8e8e8;
+            --gray-mid: #b0b0b0;
+            --gray-dark: #333333;
+            --accent: #1a1a1a;
+            --shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.12);
+            --radius: 20px;
+            --radius-sm: 12px;
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Helvetica Neue', 'Arial', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 20px;
+            background-image:
+                radial-gradient(circle at 20% 20%, rgba(0, 0, 0, 0.02) 0%, transparent 50%),
+                radial-gradient(circle at 80% 60%, rgba(0, 0, 0, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 50% 80%, rgba(0, 0, 0, 0.02) 0%, transparent 50%);
+            background-attachment: fixed;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 10px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-top: 10px;
+        }
+
+        .header .logo-icon {
+            font-size: 48px;
+            display: block;
+            margin-bottom: 4px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-8px);
+            }
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: #0a0a0a;
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .header .subtitle {
+            font-size: 0.85rem;
+            color: #666;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+        }
+
+        /* Search */
+        .search-wrapper {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 28px;
+            position: relative;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 16px 20px;
+            font-size: 1rem;
+            border: 2.5px solid #1a1a1a;
+            border-radius: 50px;
+            background: #fff;
+            color: #1a1a1a;
+            outline: none;
+            transition: var(--transition);
+            font-family: inherit;
+            letter-spacing: 0.3px;
+        }
+
+        .search-input::placeholder {
+            color: #999;
+            font-size: 0.9rem;
+        }
+        .search-input:focus {
+            border-color: #000;
+            box-shadow: 0 0 0 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .search-btn {
+            padding: 16px 28px;
+            font-size: 1rem;
+            font-weight: 700;
+            background: #0a0a0a;
+            color: #fff;
+            border: 2.5px solid #0a0a0a;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+            letter-spacing: 0.3px;
+            font-family: inherit;
+        }
+
+        .search-btn:hover {
+            background: #1a1a1a;
+            border-color: #1a1a1a;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+        .search-btn:active {
+            transform: scale(0.96);
+            transition: 0.1s;
+        }
+
+        .location-btn {
+            padding: 16px 18px;
+            font-size: 1.3rem;
+            background: #fff;
+            border: 2.5px solid #1a1a1a;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: var(--transition);
+            line-height: 1;
+        }
+        .location-btn:hover {
+            background: #f5f5f5;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+        }
+        .location-btn:active {
+            transform: scale(0.94);
+            transition: 0.1s;
+        }
+
+        /* Loading */
+        .loading-indicator {
+            text-align: center;
+            padding: 30px;
+            display: none;
+        }
+        .loading-indicator.active {
+            display: block;
+        }
+        .spinner {
+            display: inline-block;
+            width: 36px;
+            height: 36px;
+            border: 3px solid #e0e0e0;
+            border-top-color: #0a0a0a;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Error */
+        .error-box {
+            display: none;
+            background: #fff;
+            border: 2px solid #1a1a1a;
+            border-radius: var(--radius-sm);
+            padding: 18px 22px;
+            text-align: center;
+            color: #1a1a1a;
+            font-weight: 600;
+            margin-bottom: 20px;
+            animation: fadeIn 0.4s ease;
+        }
+        .error-box.show {
+            display: block;
+        }
+        .error-box .error-icon {
+            font-size: 2rem;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Weather Container */
+        .weather-container {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        .weather-container.active {
+            display: block;
+        }
+
+        /* Current Weather Card */
+        .current-weather-card {
+            background: #0a0a0a;
+            color: #f0f0f0;
+            border-radius: var(--radius);
+            padding: 30px 26px 26px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .current-weather-card::before {
+            content: '';
+            position: absolute;
+            top: -40px;
+            right: -40px;
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.03);
+            pointer-events: none;
+        }
+
+        .current-weather-card::after {
+            content: '';
+            position: absolute;
+            bottom: -30px;
+            left: -30px;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.02);
+            pointer-events: none;
+        }
+
+        .current-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 16px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .city-info h2 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin: 0;
+            color: #fff;
+            letter-spacing: -0.3px;
+        }
+        .city-info .date-text {
+            font-size: 0.85rem;
+            color: #aaa;
+            margin-top: 2px;
+        }
+        .city-info .weather-desc {
+            font-size: 0.95rem;
+            color: #ccc;
+            margin-top: 4px;
+            font-weight: 500;
+        }
+
+        .weather-icon-large {
+            font-size: 72px;
+            line-height: 1;
+            position: relative;
+            z-index: 1;
+            filter: drop-shadow(0 4px 12px rgba(255, 255, 255, 0.15));
+            animation: iconPulse 4s ease-in-out infinite;
+        }
+
+        @keyframes iconPulse {
+            0%,
+            100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.08);
+            }
+        }
+
+        .temp-big {
+            font-size: 4.5rem;
+            font-weight: 900;
+            letter-spacing: -2px;
+            line-height: 1;
+            color: #fff;
+            position: relative;
+            z-index: 1;
+            margin: 8px 0 4px;
+        }
+        .temp-big .degree {
+            font-size: 2.5rem;
+            vertical-align: super;
+            font-weight: 600;
+            margin-left: -4px;
+        }
+
+        .feels-like {
+            font-size: 0.9rem;
+            color: #bbb;
+            position: relative;
+            z-index: 1;
+            margin-bottom: 14px;
+        }
+
+        .details-row {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 1;
+        }
+
+        .detail-item {
+            background: rgba(255, 255, 255, 0.07);
+            border-radius: var(--radius-sm);
+            padding: 12px 16px;
+            flex: 1;
+            min-width: 80px;
+            text-align: center;
+            backdrop-filter: blur(4px);
+        }
+        .detail-item .detail-icon {
+            font-size: 1.4rem;
+            display: block;
+            margin-bottom: 2px;
+        }
+        .detail-item .detail-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #999;
+        }
+        .detail-item .detail-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        /* Divider */
+        .section-divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 22px 0 14px;
+        }
+        .section-divider .line {
+            flex: 1;
+            height: 1px;
+            background: #d0d0d0;
+        }
+        .section-divider span {
+            font-weight: 700;
+            font-size: 0.85rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: #555;
+            white-space: nowrap;
+        }
+
+        /* Hourly Forecast */
+        .hourly-forecast {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 8px 4px 16px;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+            scrollbar-color: #bbb transparent;
+        }
+        .hourly-forecast::-webkit-scrollbar {
+            height: 4px;
+        }
+        .hourly-forecast::-webkit-scrollbar-track {
+            background: transparent;
+            border-radius: 10px;
+        }
+        .hourly-forecast::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 10px;
+        }
+
+        .hourly-card {
+            flex: 0 0 auto;
+            min-width: 78px;
+            background: #fff;
+            border: 2px solid #e0e0e0;
+            border-radius: var(--radius-sm);
+            padding: 14px 10px;
+            text-align: center;
+            transition: var(--transition);
+            cursor: default;
+            position: relative;
+        }
+        .hourly-card:hover {
+            border-color: #1a1a1a;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 22px rgba(0, 0, 0, 0.1);
+            z-index: 2;
+        }
+        .hourly-card.now {
+            border-color: #0a0a0a;
+            background: #0a0a0a;
+            color: #fff;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+        }
+        .hourly-card.now .hourly-time {
+            color: #ddd;
+        }
+        .hourly-card.now .hourly-temp {
+            color: #fff;
+        }
+        .hourly-card .hourly-time {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 4px;
+            letter-spacing: 0.2px;
+        }
+        .hourly-card .hourly-icon {
+            font-size: 2rem;
+            display: block;
+            margin: 4px 0;
+        }
+        .hourly-card .hourly-temp {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+        .hourly-card .hourly-humidity {
+            font-size: 0.7rem;
+            color: #888;
+            margin-top: 2px;
+        }
+        .hourly-card.now .hourly-humidity {
+            color: #bbb;
+        }
+        .badge-now {
+            display: inline-block;
+            font-size: 0.6rem;
+            font-weight: 700;
+            background: #fff;
+            color: #0a0a0a;
+            padding: 2px 8px;
+            border-radius: 20px;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+
+        /* Sunrise / Sunset */
+        .sun-row {
+            display: flex;
+            gap: 12px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        .sun-item {
+            flex: 1;
+            background: #fff;
+            border: 2px solid #e0e0e0;
+            border-radius: var(--radius-sm);
+            padding: 12px 14px;
+            text-align: center;
+            min-width: 100px;
+        }
+        .sun-item .sun-icon {
+            font-size: 1.8rem;
+        }
+        .sun-item .sun-label {
+            font-size: 0.7rem;
+            letter-spacing: 1px;
+            color: #777;
+            text-transform: uppercase;
+        }
+        .sun-item .sun-time {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+
+        /* Footer */
+        .footer-note {
+            text-align: center;
+            color: #aaa;
+            font-size: 0.7rem;
+            margin-top: 20px;
+            letter-spacing: 0.5px;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            .temp-big {
+                font-size: 3.5rem;
+            }
+            .weather-icon-large {
+                font-size: 56px;
+            }
+            .search-input {
+                padding: 14px 16px;
+                font-size: 0.9rem;
+            }
+            .search-btn {
+                padding: 14px 20px;
+                font-size: 0.9rem;
+            }
+            .location-btn {
+                padding: 14px 14px;
+                font-size: 1.1rem;
+            }
+            .current-weather-card {
+                padding: 22px 16px 18px;
+            }
+            .details-row {
+                gap: 8px;
+            }
+            .detail-item {
+                padding: 10px 8px;
+                min-width: 60px;
+            }
+            .hourly-card {
+                min-width: 65px;
+                padding: 10px 7px;
+            }
+            .hourly-card .hourly-icon {
+                font-size: 1.5rem;
+            }
+            .hourly-card .hourly-temp {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <span class="logo-icon">🌐</span>
+            <h1>محرك بحث الطقس</h1>
+            <p class="subtitle">اكتشف حالة الطقس في أي مدينة بالعالم</p>
+        </div>
+
+        <!-- Search -->
+        <div class="search-wrapper">
+            <input
+            type="text"
+            class="search-input"
+            id="searchInput"
+            placeholder="🔍  اكتب اسم المدينة... (مثال: القاهرة، London، دبي)"
+            autocomplete="off"
+            />
+            <button class="search-btn" id="searchBtn" title="بحث">بحث</button>
+            <button class="location-btn" id="locationBtn" title="موقعي الحالي">📍</button>
+        </div>
+
+        <!-- Loading -->
+        <div class="loading-indicator" id="loadingIndicator">
+            <div class="spinner"></div>
+            <p style="margin-top:10px;color:#666;font-weight:500;">جاري تحميل بيانات الطقس...</p>
+        </div>
+
+        <!-- Error -->
+        <div class="error-box" id="errorBox">
+            <span class="error-icon">⚠️</span>
+            <span id="errorText">المدينة غير موجودة، حاول مرة أخرى</span>
+        </div>
+
+        <!-- Weather Data -->
+        <div class="weather-container" id="weatherContainer">
+            <!-- Current Weather -->
+            <div class="current-weather-card">
+                <div class="current-top">
+                    <div class="city-info">
+                        <h2 id="cityName">--</h2>
+                        <p class="date-text" id="dateText">--</p>
+                        <p class="weather-desc" id="weatherDesc">--</p>
+                    </div>
+                    <div class="weather-icon-large" id="weatherIconLarge">--</div>
+                </div>
+                <div class="temp-big">
+                    <span id="tempBig">--</span><span class="degree">°</span>
+                </div>
+                <p class="feels-like" id="feelsLike">--</p>
+                <div class="details-row">
+                    <div class="detail-item">
+                        <span class="detail-icon">💧</span>
+                        <span class="detail-label">الرطوبة</span>
+                        <span class="detail-value" id="humidityValue">--</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-icon">💨</span>
+                        <span class="detail-label">الرياح</span>
+                        <span class="detail-value" id="windValue">--</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-icon">📊</span>
+                        <span class="detail-label">الضغط</span>
+                        <span class="detail-value" id="pressureValue">--</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-icon">👁️</span>
+                        <span class="detail-label">الرؤية</span>
+                        <span class="detail-value" id="visibilityValue">--</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sunrise & Sunset -->
+            <div class="sun-row">
+                <div class="sun-item">
+                    <span class="sun-icon">🌅</span>
+                    <span class="sun-label">شروق الشمس</span>
+                    <span class="sun-time" id="sunriseTime">--</span>
+                </div>
+                <div class="sun-item">
+                    <span class="sun-icon">🌇</span>
+                    <span class="sun-label">غروب الشمس</span>
+                    <span class="sun-time" id="sunsetTime">--</span>
+                </div>
+            </div>
+
+            <!-- Hourly Forecast -->
+            <div class="section-divider">
+                <div class="line"></div>
+                <span>📋 توقعات اليوم</span>
+                <div class="line"></div>
+            </div>
+            <div class="hourly-forecast" id="hourlyForecast">
+                <!-- Dynamic hourly cards -->
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <p class="footer-note">⚡ بيانات الطقس مقدمة من OpenWeatherMap | تصميم أبيض وأسود</p>
+    </div>
+
+    <script>
+        (function() {
+            // ============ DOM Elements ============
+            const searchInput = document.getElementById('searchInput');
+            const searchBtn = document.getElementById('searchBtn');
+            const locationBtn = document.getElementById('locationBtn');
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const errorBox = document.getElementById('errorBox');
+            const errorText = document.getElementById('errorText');
+            const weatherContainer = document.getElementById('weatherContainer');
+
+            // Current weather elements
+            const cityNameEl = document.getElementById('cityName');
+            const dateTextEl = document.getElementById('dateText');
+            const weatherDescEl = document.getElementById('weatherDesc');
+            const weatherIconLargeEl = document.getElementById('weatherIconLarge');
+            const tempBigEl = document.getElementById('tempBig');
+            const feelsLikeEl = document.getElementById('feelsLike');
+            const humidityValueEl = document.getElementById('humidityValue');
+            const windValueEl = document.getElementById('windValue');
+            const pressureValueEl = document.getElementById('pressureValue');
+            const visibilityValueEl = document.getElementById('visibilityValue');
+            const sunriseTimeEl = document.getElementById('sunriseTime');
+            const sunsetTimeEl = document.getElementById('sunsetTime');
+            const hourlyForecastEl = document.getElementById('hourlyForecast');
+
+            // ============ API Configuration ============
+            const API_KEY = 'bf171ffd0c84b0265385a520f3d7178c';
+            const BASE_URL_CURRENT = 'https://api.openweathermap.org/data/2.5/weather';
+            const BASE_URL_FORECAST = 'https://api.openweathermap.org/data/2.5/forecast';
+
+            // ============ Weather Icon Mapping ============
+            function getWeatherEmoji(weatherId) {
+                if (weatherId >= 200 && weatherId < 300) return '⛈️'; // Thunderstorm
+                if (weatherId >= 300 && weatherId < 400) return '🌦️'; // Drizzle
+                if (weatherId >= 500 && weatherId < 600) return '🌧️'; // Rain
+                if (weatherId >= 600 && weatherId < 700) return '❄️'; // Snow
+                if (weatherId >= 700 && weatherId < 800) return '🌫️'; // Atmosphere (mist, fog, etc.)
+                if (weatherId === 800) return '☀️'; // Clear sky
+                if (weatherId === 801) return '🌤️'; // Few clouds
+                if (weatherId === 802) return '⛅'; // Scattered clouds
+                if (weatherId >= 803 && weatherId <= 804) return '☁️'; // Broken / overcast clouds
+                return '🌡️'; // Default
+            }
+
+            function getWeatherEmojiSimple(weatherId) {
+                // Simpler version for small hourly cards
+                if (weatherId >= 200 && weatherId < 300) return '⛈️';
+                if (weatherId >= 300 && weatherId < 600) return '🌧️';
+                if (weatherId >= 600 && weatherId < 700) return '❄️';
+                if (weatherId >= 700 && weatherId < 800) return '🌫️';
+                if (weatherId === 800) return '☀️';
+                if (weatherId === 801) return '🌤️';
+                if (weatherId >= 802 && weatherId <= 804) return '☁️';
+                return '🌡️';
+            }
+
+            // ============ Helper Functions ============
+            function formatTime(timestamp, timezoneOffset) {
+                // Convert UTC timestamp to local time using timezone offset (seconds)
+                const localTime = new Date((timestamp + timezoneOffset) * 1000);
+                const hours = localTime.getUTCHours();
+                const minutes = localTime.getUTCMinutes();
+                const h = hours % 12 || 12;
+                const ampm = hours >= 12 ? 'م' : 'ص';
+                return `${h}:${minutes.toString().padStart(2, '0')} ${ampm}`;
+            }
+
+            function formatTime24(timestamp, timezoneOffset) {
+                const localTime = new Date((timestamp + timezoneOffset) * 1000);
+                const hours = localTime.getUTCHours();
+                const minutes = localTime.getUTCMinutes();
+                return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+            }
+
+            function formatDate(timestamp, timezoneOffset, lang = 'ar') {
+                const localTime = new Date((timestamp + timezoneOffset) * 1000);
+                const options = {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                };
+                if (lang === 'ar') {
+                    return localTime.toLocaleDateString('ar-SA', options);
+                }
+                return localTime.toLocaleDateString('en-US', options);
+            }
+
+            function getCurrentHourUTC() {
+                const now = new Date();
+                return now.getUTCHours();
+            }
+
+            function showLoading() {
+                loadingIndicator.classList.add('active');
+                errorBox.classList.remove('show');
+                weatherContainer.classList.remove('active');
+            }
+
+            function hideLoading() {
+                loadingIndicator.classList.remove('active');
+            }
+
+            function showError(message) {
+                errorText.textContent = message || 'حدث خطأ، يرجى المحاولة مرة أخرى';
+                errorBox.classList.add('show');
+                weatherContainer.classList.remove('active');
+                hideLoading();
+            }
+
+            function hideError() {
+                errorBox.classList.remove('show');
+            }
+
+            function showWeather() {
+                weatherContainer.classList.add('active');
+                hideLoading();
+                hideError();
+            }
+
+            // ============ Fetch Weather Data ============
+            async function fetchWeatherByCity(cityName) {
+                showLoading();
+                try {
+                    // Fetch current weather
+                    const currentUrl =
+                        `${BASE_URL_CURRENT}?q=${encodeURIComponent(cityName)}&appid=${API_KEY}&units=metric&lang=ar`;
+                    const currentResponse = await fetch(currentUrl);
+
+                    if (!currentResponse.ok) {
+                        if (currentResponse.status === 401) {
+                            throw new Error('مفتاح API غير صالح أو غير مفعّل. تأكد من تفعيل المفتاح.');
+                        } else if (currentResponse.status === 404) {
+                            throw new Error('المدينة غير موجودة. تأكد من الاسم وحاول مجدداً.');
+                        } else if (currentResponse.status === 429) {
+                            throw new Error('تم تجاوز حد الطلبات. حاول لاحقاً.');
+                        } else {
+                            throw new Error('تعذر الاتصال بخدمة الطقس. حاول مرة أخرى.');
+                        }
+                    }
+
+                    const currentData = await currentResponse.json();
+
+                    // Fetch 5-day / 3-hour forecast
+                    const forecastUrl =
+                        `${BASE_URL_FORECAST}?q=${encodeURIComponent(cityName)}&appid=${API_KEY}&units=metric&lang=ar`;
+                    const forecastResponse = await fetch(forecastUrl);
+                    if (!forecastResponse.ok) {
+                        throw new Error('تعذر تحميل التوقعات. حاول مرة أخرى.');
+                    }
+                    const forecastData = await forecastResponse.json();
+
+                    // Process and display data
+                    processAndDisplay(currentData, forecastData);
+                    showWeather();
+
+                    // Scroll forecast into view smoothly
+                    setTimeout(() => {
+                        hourlyForecastEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }, 200);
+
+                } catch (error) {
+                    console.error('Weather fetch error:', error);
+                    showError(error.message);
+                }
+            }
+
+            async function fetchWeatherByCoords(lat, lon) {
+                showLoading();
+                try {
+                    const currentUrl =
+                        `${BASE_URL_CURRENT}?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric&lang=ar`;
+                    const currentResponse = await fetch(currentUrl);
+
+                    if (!currentResponse.ok) {
+                        if (currentResponse.status === 401) {
+                            throw new Error('مفتاح API غير صالح أو غير مفعّل.');
+                        } else {
+                            throw new Error('تعذر الاتصال بخدمة الطقس.');
+                        }
+                    }
+
+                    const currentData = await currentResponse.json();
+
+                    const forecastUrl =
+                        `${BASE_URL_FORECAST}?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric&lang=ar`;
+                    const forecastResponse = await fetch(forecastUrl);
+                    if (!forecastResponse.ok) {
+                        throw new Error('تعذر تحميل التوقعات.');
+                    }
+                    const forecastData = await forecastResponse.json();
+
+                    processAndDisplay(currentData, forecastData);
+                    showWeather();
+
+                    setTimeout(() => {
+                        hourlyForecastEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }, 200);
+
+                } catch (error) {
+                    console.error('Geolocation weather fetch error:', error);
+                    showError(error.message);
+                }
+            }
+
+            // ============ Process & Display ============
+            function processAndDisplay(currentData, forecastData) {
+                const timezoneOffset = currentData.timezone; // seconds offset from UTC
+
+                // --- Current Weather ---
+                const cityName = currentData.name || 'غير معروف';
+                const country = currentData.sys?.country || '';
+                const fullCityName = country ? `${cityName}، ${country}` : cityName;
+                const dateStr = formatDate(currentData.dt, timezoneOffset, 'ar');
+                const weatherId = currentData.weather[0]?.id || 800;
+                const weatherDesc = currentData.weather[0]?.description || '--';
+                const temp = Math.round(currentData.main?.temp);
+                const feelsLike = Math.round(currentData.main?.feels_like);
+                const humidity = currentData.main?.humidity;
+                const windSpeed = currentData.wind?.speed;
+                const pressure = currentData.main?.pressure;
+                const visibility = currentData.visibility; // in meters
+                const sunrise = currentData.sys?.sunrise;
+                const sunset = currentData.sys?.sunset;
+
+                // Update DOM - Current Weather
+                cityNameEl.textContent = fullCityName;
+                dateTextEl.textContent = dateStr;
+                weatherDescEl.textContent = weatherDesc;
+                weatherIconLargeEl.textContent = getWeatherEmoji(weatherId);
+                tempBigEl.textContent = temp !== undefined && !isNaN(temp) ? temp : '--';
+                feelsLikeEl.textContent =
+                    feelsLike !== undefined && !isNaN(feelsLike) ?
+                    `الإحساس كأنها ${feelsLike}°` :
+                    '--';
+                humidityValueEl.textContent = humidity !== undefined ? `${humidity}%` : '--';
+                windValueEl.textContent = windSpeed !== undefined ? `${windSpeed} كم/س` : '--';
+                pressureValueEl.textContent = pressure !== undefined ? `${pressure} hPa` : '--';
+                visibilityValueEl.textContent =
+                    visibility !== undefined && visibility >= 0 ?
+                    visibility >= 1000 ?
+                    `${(visibility / 1000).toFixed(1)} كم` :
+                    `${visibility} م` :
+                    '--';
+                sunriseTimeEl.textContent = sunrise ? formatTime(sunrise, timezoneOffset) : '--';
+                sunsetTimeEl.textContent = sunset ? formatTime(sunset, timezoneOffset) : '--';
+
+                // --- Hourly Forecast ---
+                const forecastList = forecastData.list || [];
+                const todayDateStr = getLocalDateString(timezoneOffset);
+
+                // Filter forecast entries for today
+                let todayForecasts = forecastList.filter(entry => {
+                    const entryLocalDate = getLocalDateStringFromUTC(entry.dt, timezoneOffset);
+                    return entryLocalDate === todayDateStr;
+                });
+
+                // If fewer than 4 entries remain for today, include next day's entries
+                if (todayForecasts.length < 4 && forecastList.length > 0) {
+                    const nextDateStr = getLocalDateString(timezoneOffset, 1);
+                    const nextDayForecasts = forecastList.filter(entry => {
+                        const entryLocalDate = getLocalDateStringFromUTC(entry.dt, timezoneOffset);
+                        return entryLocalDate === nextDateStr;
+                    });
+                    // Combine: today's remaining + next day's (up to 8 total)
+                    todayForecasts = [...todayForecasts, ...nextDayForecasts].slice(0, 8);
+                } else {
+                    todayForecasts = todayForecasts.slice(0, 8);
+                }
+
+                // Fallback: if still empty, just take first 8 from forecast
+                if (todayForecasts.length === 0 && forecastList.length > 0) {
+                    todayForecasts = forecastList.slice(0, 8);
+                }
+
+                // Get current local hour for "now" badge
+                const nowLocalHour = getLocalHour(timezoneOffset);
+
+                // Build hourly cards
+                hourlyForecastEl.innerHTML = '';
+                todayForecasts.forEach((entry, index) => {
+                    const entryLocalHour = getLocalHourFromUTC(entry.dt, timezoneOffset);
+                    const isNow = (index === 0) || (entryLocalHour === nowLocalHour);
+                    const timeStr = formatTime24(entry.dt, timezoneOffset);
+                    const entryTemp = Math.round(entry.main?.temp);
+                    const entryHumidity = entry.main?.humidity;
+                    const entryWeatherId = entry.weather[0]?.id || 800;
+                    const entryEmoji = getWeatherEmojiSimple(entryWeatherId);
+
+                    const card = document.createElement('div');
+                    card.className = 'hourly-card' + (isNow ? ' now' : '');
+
+                    let badgeHTML = '';
+                    if (isNow && index === 0) {
+                        badgeHTML = '<span class="badge-now">الآن</span>';
+                    } else if (isNow) {
+                        badgeHTML = '<span class="badge-now">الآن</span>';
+                    }
+
+                    card.innerHTML = `
+                        ${badgeHTML}
+                        <div class="hourly-time">${timeStr}</div>
+                        <div class="hourly-icon">${entryEmoji}</div>
+                        <div class="hourly-temp">${entryTemp}°</div>
+                        <div class="hourly-humidity">💧 ${entryHumidity}%</div>
+                    `;
+                    hourlyForecastEl.appendChild(card);
+                });
+
+                // Scroll hourly forecast to show the "now" card
+                setTimeout(() => {
+                    const nowCard = hourlyForecastEl.querySelector('.hourly-card.now');
+                    if (nowCard) {
+                        nowCard.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                    }
+                }, 300);
+            }
+
+            function getLocalDateString(timezoneOffset, dayOffset = 0) {
+                const now = new Date();
+                const localTimestamp = now.getTime() + (timezoneOffset * 1000) + (dayOffset * 86400000);
+                const localDate = new Date(localTimestamp);
+                const y = localDate.getUTCFullYear();
+                const m = String(localDate.getUTCMonth() + 1).padStart(2, '0');
+                const d = String(localDate.getUTCDate()).padStart(2, '0');
+                return `${y}-${m}-${d}`;
+            }
+
+            function getLocalDateStringFromUTC(utcTimestamp, timezoneOffset) {
+                const localTimestamp = (utcTimestamp + timezoneOffset) * 1000;
+                const localDate = new Date(localTimestamp);
+                const y = localDate.getUTCFullYear();
+                const m = String(localDate.getUTCMonth() + 1).padStart(2, '0');
+                const d = String(localDate.getUTCDate()).padStart(2, '0');
+                return `${y}-${m}-${d}`;
+            }
+
+            function getLocalHour(timezoneOffset) {
+                const now = new Date();
+                const localTimestamp = now.getTime() + (timezoneOffset * 1000);
+                const localDate = new Date(localTimestamp);
+                return localDate.getUTCHours();
+            }
+
+            function getLocalHourFromUTC(utcTimestamp, timezoneOffset) {
+                const localTimestamp = (utcTimestamp + timezoneOffset) * 1000;
+                const localDate = new Date(localTimestamp);
+                return localDate.getUTCHours();
+            }
+
+            // ============ Event Listeners ============
+            searchBtn.addEventListener('click', () => {
+                const query = searchInput.value.trim();
+                if (query.length > 0) {
+                    fetchWeatherByCity(query);
+                } else {
+                    searchInput.focus();
+                    searchInput.style.borderColor = '#e74c3c';
+                    setTimeout(() => {
+                        searchInput.style.borderColor = '#1a1a1a';
+                    }, 1200);
+                }
+            });
+
+            searchInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    const query = searchInput.value.trim();
+                    if (query.length > 0) {
+                        fetchWeatherByCity(query);
+                    } else {
+                        searchInput.focus();
+                        searchInput.style.borderColor = '#e74c3c';
+                        setTimeout(() => {
+                            searchInput.style.borderColor = '#1a1a1a';
+                        }, 1200);
+                    }
+                }
+            });
+
+            locationBtn.addEventListener('click', () => {
+                if (navigator.geolocation) {
+                    showLoading();
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            const lat = position.coords.latitude;
+                            const lon = position.coords.longitude;
+                            fetchWeatherByCoords(lat, lon);
+                        },
+                        (error) => {
+                            hideLoading();
+                            let msg = 'تعذر الوصول لموقعك.';
+                            if (error.code === error.PERMISSION_DENIED) {
+                                msg = 'تم رفض الإذن للوصول إلى الموقع. يرجى السماح بالوصول أو البحث يدوياً.';
+                            } else if (error.code === error.TIMEOUT) {
+                                msg = 'انتهت مهلة تحديد الموقع. حاول مجدداً.';
+                            }
+                            showError(msg);
+                        }, {
+                            timeout: 10000,
+                            enableHighAccuracy: true
+                        }
+                    );
+                } else {
+                    showError('متصفحك لا يدعم تحديد الموقع الجغرافي.');
+                }
+            });
+
+            // ============ Initial State ============
+            // Clear any previous state
+            hideLoading();
+            hideError();
+            weatherContainer.classList.remove('active');
+
+            // Welcome: auto-detect location on page load (optional, gentle)
+            // Try geolocation silently on load
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude;
+                        const lon = position.coords.longitude;
+                        fetchWeatherByCoords(lat, lon);
+                    },
+                    () => {
+                        // Silent fail - user will search manually
+                        console.log('Geolocation not available or denied on load. Waiting for manual search.');
+                    }, {
+                        timeout: 6000,
+                        enableHighAccuracy: false
+                    }
+                );
+            }
+
+            console.log('🌐 محرك بحث الطقس جاهز | أبيض وأسود | OpenWeatherMap API');
+            console.log('📋 اكتب اسم أي مدينة في العالم لتحصل على درجة الحرارة والرطوبة والتوقعات');
+            console.log('☀️☁️⛈️ الأيقونات: شمس للصحو، غيوم للغيم، مطر، ثلج، والمزيد...');
+        })();
+    </script>
+</body>
+</html>
