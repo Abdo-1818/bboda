@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n="title">محرك بحث الطقس - أي مكان في العالم</title>
+    <title data-i18n="title">بحث</title>
     <style>
         :root {
             --bg: #000000;
@@ -40,6 +40,10 @@
             align-items: flex-start;
             padding: 20px;
             overflow-x: hidden;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
 
         #particleCanvas {
@@ -54,7 +58,7 @@
 
         .container {
             width: 100%;
-            max-width: 650px;
+            max-width: 680px;
             margin: 0 auto;
             padding: 10px;
             position: relative;
@@ -99,27 +103,23 @@
             animation: float 3s ease-in-out infinite;
         }
         @keyframes float {
-            0%,
-            100% {
-                transform: translateY(0);
-            }
-            50% {
-                transform: translateY(-8px);
-            }
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
         }
         .header h1 {
-            font-size: 2rem;
-            font-weight: 800;
-            letter-spacing: -0.5px;
+            font-size: 2.5rem;
+            font-weight: 900;
+            letter-spacing: -1px;
             color: #ffffff;
             margin: 0;
             line-height: 1.2;
         }
         .header .subtitle {
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             color: #cccccc;
             font-weight: 400;
             letter-spacing: 0.5px;
+            margin-top: 8px;
         }
 
         /* Search */
@@ -146,7 +146,7 @@
         }
         .search-input::placeholder {
             color: #666666;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
         }
         .search-input:focus {
             border-color: #ffffff;
@@ -197,37 +197,13 @@
             transition: 0.1s;
         }
 
-        /* Advanced search hint */
-        .search-hint {
-            font-size: 0.72rem;
-            color: #888888;
-            margin-bottom: 20px;
-            text-align: center;
-            letter-spacing: 0.3px;
-            line-height: 1.5;
-        }
-        .search-hint span {
-            background: #1a1a1a;
-            padding: 3px 10px;
-            border-radius: 20px;
-            display: inline-block;
-            margin: 2px 4px;
-            border: 1px solid #333;
-            color: #cccccc;
-            font-family: monospace;
-            font-size: 0.75rem;
-        }
-
-        /* Loading */
         .loading-indicator {
             text-align: center;
             padding: 30px;
             display: none;
             color: var(--text);
         }
-        .loading-indicator.active {
-            display: block;
-        }
+        .loading-indicator.active { display: block; }
         .spinner {
             display: inline-block;
             width: 36px;
@@ -237,13 +213,8 @@
             border-radius: 50%;
             animation: spin 0.7s linear infinite;
         }
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Suggestions dropdown */
         .suggestions-dropdown {
             display: none;
             position: absolute;
@@ -260,9 +231,7 @@
             max-height: 280px;
             overflow-y: auto;
         }
-        .suggestions-dropdown.active {
-            display: block;
-        }
+        .suggestions-dropdown.active { display: block; }
         .suggestion-item {
             padding: 14px 18px;
             cursor: pointer;
@@ -274,28 +243,16 @@
             align-items: center;
             gap: 10px;
         }
-        .suggestion-item:last-child {
-            border-bottom: none;
-        }
+        .suggestion-item:last-child { border-bottom: none; }
         .suggestion-item:hover,
         .suggestion-item.selected {
             background: #ffffff;
             color: #000000;
         }
-        .suggestion-item .sugg-name {
-            font-weight: 600;
-            font-size: 0.95rem;
-        }
-        .suggestion-item .sugg-details {
-            font-size: 0.75rem;
-            color: #aaaaaa;
-            text-align: end;
-        }
-        .suggestion-item:hover .sugg-details {
-            color: #444444;
-        }
+        .suggestion-item .sugg-name { font-weight: 600; font-size: 0.95rem; }
+        .suggestion-item .sugg-details { font-size: 0.75rem; color: #aaaaaa; text-align: end; }
+        .suggestion-item:hover .sugg-details { color: #444444; }
 
-        /* Error */
         .error-box {
             display: none;
             background: #111111;
@@ -308,35 +265,16 @@
             margin-bottom: 20px;
             animation: fadeIn 0.4s ease;
         }
-        .error-box.show {
-            display: block;
-        }
-        .error-box .error-icon {
-            font-size: 2rem;
-            display: block;
-            margin-bottom: 6px;
-        }
+        .error-box.show { display: block; }
+        .error-box .error-icon { font-size: 2rem; display: block; margin-bottom: 6px; }
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Weather Container */
-        .weather-container {
-            display: none;
-            animation: fadeIn 0.5s ease;
-        }
-        .weather-container.active {
-            display: block;
-        }
+        .weather-container { display: none; animation: fadeIn 0.5s ease; }
+        .weather-container.active { display: block; }
 
-        /* Current Weather Card */
         .current-weather-card {
             background: var(--card-bg);
             color: var(--card-text);
@@ -386,23 +324,9 @@
             color: #ffffff;
             letter-spacing: -0.3px;
         }
-        .city-info .date-text {
-            font-size: 0.85rem;
-            color: #aaaaaa;
-            margin-top: 2px;
-        }
-        .city-info .weather-desc {
-            font-size: 0.95rem;
-            color: #cccccc;
-            margin-top: 4px;
-            font-weight: 500;
-        }
-        .city-info .coord-text {
-            font-size: 0.7rem;
-            color: #777777;
-            margin-top: 2px;
-            font-family: monospace;
-        }
+        .city-info .date-text { font-size: 0.85rem; color: #aaaaaa; margin-top: 2px; }
+        .city-info .weather-desc { font-size: 0.95rem; color: #cccccc; margin-top: 4px; font-weight: 500; }
+        .city-info .coord-text { font-size: 0.7rem; color: #777777; margin-top: 2px; font-family: monospace; }
         .weather-icon-large {
             font-size: 72px;
             line-height: 1;
@@ -412,13 +336,8 @@
             animation: iconPulse 4s ease-in-out infinite;
         }
         @keyframes iconPulse {
-            0%,
-            100% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.08);
-            }
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08); }
         }
         .temp-big {
             font-size: 4.5rem;
@@ -436,20 +355,8 @@
             font-weight: 600;
             margin-left: -4px;
         }
-        .feels-like {
-            font-size: 0.9rem;
-            color: #bbbbbb;
-            position: relative;
-            z-index: 1;
-            margin-bottom: 14px;
-        }
-        .details-row {
-            display: flex;
-            gap: 16px;
-            flex-wrap: wrap;
-            position: relative;
-            z-index: 1;
-        }
+        .feels-like { font-size: 0.9rem; color: #bbbbbb; position: relative; z-index: 1; margin-bottom: 14px; }
+        .details-row { display: flex; gap: 16px; flex-wrap: wrap; position: relative; z-index: 1; }
         .detail-item {
             background: rgba(255, 255, 255, 0.05);
             border-radius: var(--radius-sm);
@@ -460,35 +367,12 @@
             backdrop-filter: blur(4px);
             border: 1px solid #222222;
         }
-        .detail-item .detail-icon {
-            font-size: 1.4rem;
-            display: block;
-            margin-bottom: 2px;
-        }
-        .detail-item .detail-label {
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #999999;
-        }
-        .detail-item .detail-value {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #ffffff;
-        }
+        .detail-item .detail-icon { font-size: 1.4rem; display: block; margin-bottom: 2px; }
+        .detail-item .detail-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: #999999; }
+        .detail-item .detail-value { font-size: 1.1rem; font-weight: 700; color: #ffffff; }
 
-        /* Divider */
-        .section-divider {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin: 22px 0 14px;
-        }
-        .section-divider .line {
-            flex: 1;
-            height: 1px;
-            background: #555555;
-        }
+        .section-divider { display: flex; align-items: center; gap: 12px; margin: 22px 0 14px; }
+        .section-divider .line { flex: 1; height: 1px; background: #555555; }
         .section-divider span {
             font-weight: 700;
             font-size: 0.85rem;
@@ -498,7 +382,6 @@
             white-space: nowrap;
         }
 
-        /* Hourly Forecast */
         .hourly-forecast {
             display: flex;
             gap: 10px;
@@ -509,17 +392,9 @@
             scrollbar-width: thin;
             scrollbar-color: #666666 transparent;
         }
-        .hourly-forecast::-webkit-scrollbar {
-            height: 4px;
-        }
-        .hourly-forecast::-webkit-scrollbar-track {
-            background: transparent;
-            border-radius: 10px;
-        }
-        .hourly-forecast::-webkit-scrollbar-thumb {
-            background: #666666;
-            border-radius: 10px;
-        }
+        .hourly-forecast::-webkit-scrollbar { height: 4px; }
+        .hourly-forecast::-webkit-scrollbar-track { background: transparent; border-radius: 10px; }
+        .hourly-forecast::-webkit-scrollbar-thumb { background: #666666; border-radius: 10px; }
         .hourly-card {
             flex: 0 0 auto;
             min-width: 78px;
@@ -545,37 +420,13 @@
             color: #000000;
             box-shadow: 0 6px 18px rgba(255, 255, 255, 0.3);
         }
-        .hourly-card.now .hourly-time {
-            color: #000000;
-        }
-        .hourly-card.now .hourly-temp {
-            color: #000000;
-        }
-        .hourly-card.now .hourly-humidity {
-            color: #222222;
-        }
-        .hourly-card .hourly-time {
-            font-size: 0.78rem;
-            font-weight: 600;
-            color: #cccccc;
-            margin-bottom: 4px;
-            letter-spacing: 0.2px;
-        }
-        .hourly-card .hourly-icon {
-            font-size: 2rem;
-            display: block;
-            margin: 4px 0;
-        }
-        .hourly-card .hourly-temp {
-            font-size: 1.15rem;
-            font-weight: 700;
-            color: #ffffff;
-        }
-        .hourly-card .hourly-humidity {
-            font-size: 0.7rem;
-            color: #aaaaaa;
-            margin-top: 2px;
-        }
+        .hourly-card.now .hourly-time { color: #000000; }
+        .hourly-card.now .hourly-temp { color: #000000; }
+        .hourly-card.now .hourly-humidity { color: #222222; }
+        .hourly-card .hourly-time { font-size: 0.78rem; font-weight: 600; color: #cccccc; margin-bottom: 4px; letter-spacing: 0.2px; }
+        .hourly-card .hourly-icon { font-size: 2rem; display: block; margin: 4px 0; }
+        .hourly-card .hourly-temp { font-size: 1.15rem; font-weight: 700; color: #ffffff; }
+        .hourly-card .hourly-humidity { font-size: 0.7rem; color: #aaaaaa; margin-top: 2px; }
         .badge-now {
             display: inline-block;
             font-size: 0.6rem;
@@ -587,18 +438,9 @@
             letter-spacing: 1px;
             margin-bottom: 4px;
         }
-        .hourly-card.now .badge-now {
-            background: #000000;
-            color: #ffffff;
-        }
+        .hourly-card.now .badge-now { background: #000000; color: #ffffff; }
 
-        /* Sunrise / Sunset */
-        .sun-row {
-            display: flex;
-            gap: 12px;
-            margin-top: 10px;
-            flex-wrap: wrap;
-        }
+        .sun-row { display: flex; gap: 12px; margin-top: 10px; flex-wrap: wrap; }
         .sun-item {
             flex: 1;
             background: #1a1a1a;
@@ -609,112 +451,64 @@
             min-width: 100px;
             color: #ffffff;
         }
-        .sun-item .sun-icon {
-            font-size: 1.8rem;
-        }
-        .sun-item .sun-label {
-            font-size: 0.7rem;
-            letter-spacing: 1px;
-            color: #aaaaaa;
-            text-transform: uppercase;
-        }
-        .sun-item .sun-time {
-            font-size: 1rem;
-            font-weight: 700;
-            color: #ffffff;
-        }
+        .sun-item .sun-icon { font-size: 1.8rem; }
+        .sun-item .sun-label { font-size: 0.7rem; letter-spacing: 1px; color: #aaaaaa; text-transform: uppercase; }
+        .sun-item .sun-time { font-size: 1rem; font-weight: 700; color: #ffffff; }
 
-        /* Responsive */
         @media (max-width: 480px) {
-            .header h1 {
-                font-size: 1.5rem;
-            }
-            .temp-big {
-                font-size: 3.5rem;
-            }
-            .weather-icon-large {
-                font-size: 56px;
-            }
-            .search-input {
-                padding: 14px 16px;
-                font-size: 0.9rem;
-            }
-            .search-btn {
-                padding: 14px 20px;
-                font-size: 0.9rem;
-            }
-            .location-btn {
-                padding: 14px 14px;
-                font-size: 1.1rem;
-            }
-            .current-weather-card {
-                padding: 22px 16px 18px;
-            }
-            .details-row {
-                gap: 8px;
-            }
-            .detail-item {
-                padding: 10px 8px;
-                min-width: 60px;
-            }
-            .hourly-card {
-                min-width: 65px;
-                padding: 10px 7px;
-            }
-            .hourly-card .hourly-icon {
-                font-size: 1.5rem;
-            }
-            .hourly-card .hourly-temp {
-                font-size: 1rem;
-            }
+            .header h1 { font-size: 2rem; }
+            .temp-big { font-size: 3.5rem; }
+            .weather-icon-large { font-size: 56px; }
+            .search-input { padding: 14px 16px; font-size: 0.9rem; }
+            .search-btn { padding: 14px 20px; font-size: 0.9rem; }
+            .location-btn { padding: 14px 14px; font-size: 1.1rem; }
+            .current-weather-card { padding: 22px 16px 18px; }
+            .details-row { gap: 8px; }
+            .detail-item { padding: 10px 8px; min-width: 60px; }
+            .hourly-card { min-width: 65px; padding: 10px 7px; }
+            .hourly-card .hourly-icon { font-size: 1.5rem; }
+            .hourly-card .hourly-temp { font-size: 1rem; }
         }
     </style>
 </head>
-<body>
+<body oncontextmenu="return false;" ondragstart="return false;" onselectstart="return false;" oncopy="return false;" oncut="return false;">
     <canvas id="particleCanvas"></canvas>
 
     <div class="container">
-        <!-- Language Toggle -->
         <div class="lang-toggle-wrapper">
             <button class="lang-toggle-btn" id="langToggleBtn" data-i18n="lang_toggle">English</button>
         </div>
 
-        <!-- Header -->
         <div class="header">
-            <span class="logo-icon">🌐</span>
-            <h1 data-i18n="header_title">محرك بحث الطقس العالمي</h1>
-            <p class="subtitle" data-i18n="header_subtitle">اكتشف حالة الطقس في أي مدينة أو قرية أو مكان بالعالم</p>
+            <span class="logo-icon">🔍</span>
+            <h1 data-i18n="header_title">بحث</h1>
+            <p class="subtitle" data-i18n="header_subtitle">ابحث عن الطقس من هنا</p>
         </div>
 
-        <!-- Search -->
         <div class="search-wrapper" style="position: relative;">
             <input
             type="text"
             class="search-input"
             id="searchInput"
             data-i18n-placeholder="search_placeholder"
+            placeholder="ابحث عن الطقس من هنا"
             autocomplete="off"
             />
             <button class="search-btn" id="searchBtn" title="بحث" data-i18n="search_btn">بحث</button>
             <button class="location-btn" id="locationBtn" title="موقعي الحالي">📍</button>
             <div class="suggestions-dropdown" id="suggestionsDropdown"></div>
         </div>
-        <p class="search-hint" data-i18n="search_hint">
-        </p>
 
-        <!-- Loading -->
         <div class="loading-indicator" id="loadingIndicator">
             <div class="spinner"></div>
             <p style="margin-top:10px;color:#cccccc;font-weight:500;" data-i18n="loading_text">جاري تحميل بيانات الطقس...</p>
         </div>
 
-        <!-- Error -->
         <div class="error-box" id="errorBox">
             <span class="error-icon">⚠️</span>
-            <span id="errorText" data-i18n="error_default">المدينة غير موجودة، حاول مرة أخرى</span>
+            <span id="errorText" data-i18n="error_default">تعذر العثور على الموقع. حاول مجدداً.</span>
         </div>
 
-        <!-- Weather Data -->
         <div class="weather-container" id="weatherContainer">
             <div class="current-weather-card">
                 <div class="current-top">
@@ -781,14 +575,14 @@
             // ============ i18n ============
             const translations = {
                 ar: {
-                    title: 'محرك بحث الطقس العالمي',
+                    title: 'بحث',
                     lang_toggle: 'English',
-                    header_title: 'محرك بحث الطقس العالمي',
-                    header_subtitle: 'اكتشف حالة الطقس في أي مدينة أو قرية أو مكان بالعالم',
-                    search_placeholder: '🔍  اكتب اسم المدينة أو القرية... (مثال: القاهرة، London، قرية العلا، 30.0444,31.2357)',
+                    header_title: 'بحث',
+                    header_subtitle: 'ابحث عن الطقس من هنا',
+                    search_placeholder: 'ابحث عن الطقس من هنا',
                     search_btn: 'بحث',
                     loading_text: 'جاري تحميل بيانات الطقس...',
-                    error_default: 'تعذر العثور على الموقع. جرب كتابة الاسم مع الدولة أو استخدم الإحداثيات.',
+                    error_default: 'تعذر العثور على الموقع. حاول مجدداً.',
                     feels_like: 'الإحساس كأنها',
                     humidity_label: 'الرطوبة',
                     wind_label: 'الرياح',
@@ -803,26 +597,25 @@
                     visibility_km: 'كم',
                     visibility_m: 'م',
                     error_api_key: 'مفتاح API غير صالح أو غير مفعّل.',
-                    error_city_not_found: 'الموقع غير موجود. جرب إضافة اسم الدولة أو استخدم الإحداثيات (مثال: 30.0444,31.2357).',
+                    error_city_not_found: 'الموقع غير موجود. جرب إضافة اسم الدولة أو استخدم الإحداثيات.',
                     error_rate_limit: 'تم تجاوز حد الطلبات. حاول لاحقاً.',
-                    error_network: 'تعذر الاتصال بخدمة الطقس. تحقق من اتصالك بالإنترنت.',
+                    error_network: 'تعذر الاتصال بخدمة الطقس.',
                     error_forecast: 'تعذر تحميل التوقعات.',
                     error_geolocation_denied: 'تم رفض الإذن للوصول إلى الموقع.',
                     error_geolocation_timeout: 'انتهت مهلة تحديد الموقع.',
                     error_geolocation_not_supported: 'متصفحك لا يدعم تحديد الموقع.',
                     error_geolocation_general: 'تعذر الوصول لموقعك.',
-                    error_coords_invalid: 'الإحداثيات غير صالحة. استخدم الصيغة: خط العرض,خط الطول (مثال: 30.0444,31.2357)',
+                    error_coords_invalid: 'الإحداثيات غير صالحة.',
                 },
                 en: {
-                    title: 'Global Weather Search Engine',
+                    title: 'Search',
                     lang_toggle: 'العربية',
-                    header_title: 'Global Weather Search Engine',
-                    header_subtitle: 'Discover weather in any city, village, or place worldwide',
-                    search_placeholder: '🔍  Enter city or village name... (e.g., Cairo, London, AlUla village, 30.0444,31.2357)',
+                    header_title: 'Search',
+                    header_subtitle: 'Search weather from here',
+                    search_placeholder: 'Search weather from here',
                     search_btn: 'Search',
-                    search_hint: 'Search by <span>city</span> or <span>village</span> name, or enter <span>coordinates</span> like: <span>30.0444,31.2357</span> or name with country <span>AlUla, Egypt</span>',
                     loading_text: 'Loading weather data...',
-                    error_default: 'Location not found. Try adding the country name or use coordinates.',
+                    error_default: 'Location not found. Try again.',
                     feels_like: 'Feels like',
                     humidity_label: 'Humidity',
                     wind_label: 'Wind',
@@ -836,24 +629,21 @@
                     pressure_unit: 'hPa',
                     visibility_km: 'km',
                     visibility_m: 'm',
-                    error_api_key: 'Invalid or inactive API key.',
-                    error_city_not_found: 'Location not found. Try adding country name or use coordinates (e.g., 30.0444,31.2357).',
-                    error_rate_limit: 'Request limit exceeded. Try later.',
-                    error_network: 'Unable to connect. Check your internet.',
+                    error_api_key: 'Invalid API key.',
+                    error_city_not_found: 'Location not found.',
+                    error_rate_limit: 'Request limit exceeded.',
+                    error_network: 'Unable to connect.',
                     error_forecast: 'Unable to load forecast.',
                     error_geolocation_denied: 'Location permission denied.',
                     error_geolocation_timeout: 'Location request timed out.',
                     error_geolocation_not_supported: 'Geolocation not supported.',
                     error_geolocation_general: 'Could not access location.',
-                    error_coords_invalid: 'Invalid coordinates. Use format: latitude,longitude (e.g., 30.0444,31.2357)',
+                    error_coords_invalid: 'Invalid coordinates.',
                 }
             };
 
             let currentLang = 'ar';
-
-            function t(key) {
-                return translations[currentLang][key] || key;
-            }
+            function t(key) { return translations[currentLang][key] || key; }
 
             function updateLanguageUI() {
                 document.documentElement.lang = currentLang;
@@ -861,26 +651,19 @@
                 document.querySelectorAll('[data-i18n]').forEach(el => {
                     const key = el.getAttribute('data-i18n');
                     if (translations[currentLang][key]) {
-                        if (key === 'search_hint') {
-                            el.innerHTML = translations[currentLang][key];
-                        } else {
-                            el.textContent = translations[currentLang][key];
-                        }
+                        el.textContent = translations[currentLang][key];
                     }
                 });
                 document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
                     const key = el.getAttribute('data-i18n-placeholder');
-                    if (translations[currentLang][key]) {
-                        el.placeholder = translations[currentLang][key];
-                    }
+                    if (translations[currentLang][key]) el.placeholder = translations[currentLang][key];
                 });
                 const searchBtn = document.getElementById('searchBtn');
                 if (searchBtn) searchBtn.title = t('search_btn');
                 const locationBtn = document.getElementById('locationBtn');
                 if (locationBtn) locationBtn.title = currentLang === 'ar' ? 'موقعي الحالي' : 'My location';
                 if (lastWeatherData) {
-                    renderCurrentWeather(lastWeatherData.current, lastWeatherData.timezoneOffset, lastWeatherData
-                        .coords);
+                    renderCurrentWeather(lastWeatherData.current, lastWeatherData.timezoneOffset, lastWeatherData.coords);
                     renderHourlyForecast(lastWeatherData.forecastList, lastWeatherData.timezoneOffset);
                 }
             }
@@ -900,7 +683,6 @@
             const errorText = document.getElementById('errorText');
             const weatherContainer = document.getElementById('weatherContainer');
             const suggestionsDropdown = document.getElementById('suggestionsDropdown');
-
             const cityNameEl = document.getElementById('cityName');
             const dateTextEl = document.getElementById('dateText');
             const weatherDescEl = document.getElementById('weatherDesc');
@@ -928,7 +710,7 @@
             let selectedSuggestionIndex = -1;
             let currentSuggestions = [];
 
-            // ============ Weather Icon Mapping ============
+            // ============ Weather Icons ============
             function getWeatherEmoji(weatherId) {
                 if (weatherId >= 200 && weatherId < 300) return '⛈️';
                 if (weatherId >= 300 && weatherId < 400) return '🌦️';
@@ -941,7 +723,6 @@
                 if (weatherId >= 803 && weatherId <= 804) return '☁️';
                 return '🌡️';
             }
-
             function getWeatherEmojiSimple(weatherId) {
                 if (weatherId >= 200 && weatherId < 300) return '⛈️';
                 if (weatherId >= 300 && weatherId < 600) return '🌧️';
@@ -953,72 +734,51 @@
                 return '🌡️';
             }
 
-            // ============ Helper Functions ============
+            // ============ Helpers ============
             function formatTime(timestamp, timezoneOffset) {
                 const localTime = new Date((timestamp + timezoneOffset) * 1000);
                 const hours = localTime.getUTCHours();
                 const minutes = localTime.getUTCMinutes();
                 const h = hours % 12 || 12;
-                const ampm = hours >= 12 ? (currentLang === 'ar' ? 'م' : 'PM') : (currentLang === 'ar' ? 'ص' :
-                'AM');
+                const ampm = hours >= 12 ? (currentLang === 'ar' ? 'م' : 'PM') : (currentLang === 'ar' ? 'ص' : 'AM');
                 return `${h}:${minutes.toString().padStart(2, '0')} ${ampm}`;
             }
-
             function formatTime24(timestamp, timezoneOffset) {
                 const localTime = new Date((timestamp + timezoneOffset) * 1000);
                 const hours = localTime.getUTCHours();
                 const minutes = localTime.getUTCMinutes();
                 return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
             }
-
             function formatDate(timestamp, timezoneOffset) {
                 const localTime = new Date((timestamp + timezoneOffset) * 1000);
                 const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-                if (currentLang === 'ar') {
-                    return localTime.toLocaleDateString('ar-SA', options);
-                } else {
-                    return localTime.toLocaleDateString('en-US', options);
-                }
+                return currentLang === 'ar' ? localTime.toLocaleDateString('ar-SA', options) : localTime.toLocaleDateString('en-US', options);
             }
-
             function showLoading() {
                 loadingIndicator.classList.add('active');
                 errorBox.classList.remove('show');
                 weatherContainer.classList.remove('active');
                 suggestionsDropdown.classList.remove('active');
             }
-
-            function hideLoading() {
-                loadingIndicator.classList.remove('active');
-            }
-
+            function hideLoading() { loadingIndicator.classList.remove('active'); }
             function showError(messageKey) {
-                const msg = translations[currentLang][messageKey] || translations[currentLang].error_default ||
-                    messageKey;
+                const msg = translations[currentLang][messageKey] || translations[currentLang].error_default || messageKey;
                 errorText.textContent = msg;
                 errorBox.classList.add('show');
                 weatherContainer.classList.remove('active');
                 hideLoading();
             }
-
-            function hideError() {
-                errorBox.classList.remove('show');
-            }
-
+            function hideError() { errorBox.classList.remove('show'); }
             function showWeather() {
                 weatherContainer.classList.add('active');
                 hideLoading();
                 hideError();
             }
 
-            // ============ Check if input is coordinates ============
             function isCoordinates(input) {
                 const trimmed = input.trim();
-                const coordRegex = /^[-]?\d{1,3}\.\d{1,10},\s*[-]?\d{1,3}\.\d{1,10}$/;
-                const simpleRegex = /^[-]?\d+\.?\d*,\s*[-]?\d+\.?\d*$/;
-                return coordRegex.test(trimmed) || simpleRegex.test(trimmed);
+                return /^[-]?\d{1,3}\.\d{1,10},\s*[-]?\d{1,3}\.\d{1,10}$/.test(trimmed) || /^[-]?\d+\.?\d*,\s*[-]?\d+\.?\d*$/.test(trimmed);
             }
-
             function parseCoordinates(input) {
                 const parts = input.trim().split(/[\s,]+/);
                 if (parts.length >= 2) {
@@ -1031,11 +791,9 @@
                 return null;
             }
 
-            // ============ Reverse Geocode to get location name ============
             async function reverseGeocode(lat, lon) {
                 try {
-                    const url =
-                        `${REVERSE_GEO_URL}?lat=${lat}&lon=${lon}&limit=3&appid=${API_KEY}`;
+                    const url = `${REVERSE_GEO_URL}?lat=${lat}&lon=${lon}&limit=3&appid=${API_KEY}`;
                     const response = await fetch(url);
                     if (response.ok) {
                         const data = await response.json();
@@ -1048,24 +806,16 @@
                             return parts.join('، ');
                         }
                     }
-                } catch (e) {
-                    console.log('Reverse geocode failed:', e);
-                }
+                } catch (e) {}
                 return null;
             }
 
-            // ============ Geocoding with suggestions ============
             async function getCoordinatesWithSuggestions(query) {
-                const url =
-                    `${GEO_URL}?q=${encodeURIComponent(query)}&limit=8&appid=${API_KEY}`;
+                const url = `${GEO_URL}?q=${encodeURIComponent(query)}&limit=8&appid=${API_KEY}`;
                 const response = await fetch(url);
-                if (!response.ok) {
-                    throw new Error('error_network');
-                }
+                if (!response.ok) throw new Error('error_network');
                 const data = await response.json();
-                if (!data || data.length === 0) {
-                    throw new Error('error_city_not_found');
-                }
+                if (!data || data.length === 0) throw new Error('error_city_not_found');
                 return data.map(item => ({
                     lat: item.lat,
                     lon: item.lon,
@@ -1075,7 +825,6 @@
                     displayName: buildDisplayName(item, query),
                 }));
             }
-
             function buildDisplayName(item, query) {
                 const name = item.local_names?.[currentLang] || item.name || query;
                 const state = item.state || '';
@@ -1085,7 +834,6 @@
                 if (country) parts.push(country);
                 return parts.join('، ');
             }
-
             async function fetchSuggestions(query) {
                 if (query.length < 2) {
                     suggestionsDropdown.classList.remove('active');
@@ -1093,8 +841,7 @@
                     return;
                 }
                 try {
-                    const url =
-                        `${GEO_URL}?q=${encodeURIComponent(query)}&limit=7&appid=${API_KEY}`;
+                    const url = `${GEO_URL}?q=${encodeURIComponent(query)}&limit=7&appid=${API_KEY}`;
                     const response = await fetch(url);
                     if (response.ok) {
                         const data = await response.json();
@@ -1116,7 +863,6 @@
                     suggestionsDropdown.classList.remove('active');
                 }
             }
-
             function renderSuggestions() {
                 if (currentSuggestions.length === 0) {
                     suggestionsDropdown.classList.remove('active');
@@ -1127,18 +873,12 @@
                 currentSuggestions.forEach((sugg, index) => {
                     const div = document.createElement('div');
                     div.className = 'suggestion-item';
-                    div.innerHTML = `
-                        <span class="sugg-name">📍 ${sugg.displayName}</span>
-                        <span class="sugg-details">${sugg.lat.toFixed(4)}, ${sugg.lon.toFixed(4)}</span>
-                    `;
-                    div.addEventListener('click', () => {
-                        selectSuggestion(index);
-                    });
+                    div.innerHTML = `<span class="sugg-name">📍 ${sugg.displayName}</span><span class="sugg-details">${sugg.lat.toFixed(4)}, ${sugg.lon.toFixed(4)}</span>`;
+                    div.addEventListener('click', () => selectSuggestion(index));
                     suggestionsDropdown.appendChild(div);
                 });
                 suggestionsDropdown.classList.add('active');
             }
-
             function selectSuggestion(index) {
                 if (index < 0 || index >= currentSuggestions.length) return;
                 const sugg = currentSuggestions[index];
@@ -1148,7 +888,6 @@
                 fetchWeatherByCoords(sugg.lat, sugg.lon, sugg.displayName);
             }
 
-            // ============ Fetch Weather Data ============
             async function fetchWeatherByCity(cityName) {
                 showLoading();
                 try {
@@ -1160,25 +899,20 @@
                         renderSuggestions();
                         hideLoading();
                         if (coordsList.length > 0) {
-                            errorText.textContent = currentLang === 'ar' ?
-                                'تم العثور على عدة نتائج. اختر من القائمة:' :
-                                'Multiple results found. Please choose from the list:';
+                            errorText.textContent = currentLang === 'ar' ? 'تم العثور على عدة نتائج. اختر من القائمة:' : 'Multiple results found. Choose from the list:';
                             errorBox.classList.add('show');
                         }
                     }
                 } catch (error) {
-                    console.error('Weather fetch error:', error);
                     showError(error.message || 'error_default');
                 }
             }
-
             async function fetchWeatherByCoords(lat, lon, locationName = null) {
                 showLoading();
                 suggestionsDropdown.classList.remove('active');
                 currentSuggestions = [];
                 try {
-                    const currentUrl =
-                        `${BASE_URL_CURRENT}?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric&lang=${currentLang}`;
+                    const currentUrl = `${BASE_URL_CURRENT}?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric&lang=${currentLang}`;
                     const currentResponse = await fetch(currentUrl);
                     if (!currentResponse.ok) {
                         if (currentResponse.status === 401) throw new Error('error_api_key');
@@ -1187,37 +921,22 @@
                         else throw new Error('error_network');
                     }
                     const currentData = await currentResponse.json();
-
-                    const forecastUrl =
-                        `${BASE_URL_FORECAST}?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric&lang=${currentLang}`;
+                    const forecastUrl = `${BASE_URL_FORECAST}?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric&lang=${currentLang}`;
                     const forecastResponse = await fetch(forecastUrl);
-                    if (!forecastResponse.ok) {
-                        throw new Error('error_forecast');
-                    }
+                    if (!forecastResponse.ok) throw new Error('error_forecast');
                     const forecastData = await forecastResponse.json();
-
                     processAndDisplay(currentData, forecastData, { lat, lon, locationName });
                     showWeather();
-
-                    setTimeout(() => {
-                        hourlyForecastEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                    }, 200);
+                    setTimeout(() => hourlyForecastEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 200);
                 } catch (error) {
-                    console.error('Weather fetch error:', error);
                     showError(error.message || 'error_default');
                 }
             }
 
-            // ============ Process & Display ============
             function processAndDisplay(currentData, forecastData, coords) {
                 const timezoneOffset = currentData.timezone;
                 const forecastList = forecastData.list || [];
-                lastWeatherData = {
-                    current: currentData,
-                    forecastList: forecastList,
-                    timezoneOffset: timezoneOffset,
-                    coords: coords,
-                };
+                lastWeatherData = { current: currentData, forecastList, timezoneOffset, coords };
                 renderCurrentWeather(currentData, timezoneOffset, coords);
                 renderHourlyForecast(forecastList, timezoneOffset);
             }
@@ -1226,21 +945,16 @@
                 const apiCityName = currentData.name || '';
                 const country = currentData.sys?.country || '';
                 let fullCityName;
-
                 if (coords && coords.locationName && coords.locationName.trim().length > 0) {
                     fullCityName = coords.locationName;
-                    if (country && !coords.locationName.includes(country)) {
-                        fullCityName += '، ' + country;
-                    }
+                    if (country && !coords.locationName.includes(country)) fullCityName += '، ' + country;
                 } else if (apiCityName) {
                     fullCityName = country ? `${apiCityName}، ${country}` : apiCityName;
                 } else if (coords) {
-                    fullCityName =
-                        `${coords.lat.toFixed(4)}°, ${coords.lon.toFixed(4)}°`;
+                    fullCityName = `${coords.lat.toFixed(4)}°, ${coords.lon.toFixed(4)}°`;
                 } else {
                     fullCityName = currentLang === 'ar' ? 'موقع غير معروف' : 'Unknown location';
                 }
-
                 const dateStr = formatDate(currentData.dt, timezoneOffset);
                 const weatherId = currentData.weather[0]?.id || 800;
                 const weatherDesc = currentData.weather[0]?.description || '--';
@@ -1258,43 +972,27 @@
                 cityNameEl.textContent = fullCityName;
                 dateTextEl.textContent = dateStr;
                 weatherDescEl.textContent = weatherDesc;
-                coordTextEl.textContent =
-                    lat && lon ? `📍 ${lat.toFixed(4)}°, ${lon.toFixed(4)}°` : '';
+                coordTextEl.textContent = lat && lon ? `📍 ${lat.toFixed(4)}°, ${lon.toFixed(4)}°` : '';
                 weatherIconLargeEl.textContent = getWeatherEmoji(weatherId);
                 tempBigEl.textContent = !isNaN(temp) ? temp : '--';
                 feelsLikeEl.textContent = !isNaN(feelsLike) ? `${t('feels_like')} ${feelsLike}°` : '--';
                 humidityValueEl.textContent = humidity !== undefined ? `${humidity}%` : '--';
                 windValueEl.textContent = windSpeed !== undefined ? `${windSpeed} ${t('wind_unit')}` : '--';
-                pressureValueEl.textContent = pressure !== undefined ?
-                    `${pressure} ${t('pressure_unit')}` : '--';
-                visibilityValueEl.textContent = visibility !== undefined && visibility >= 0 ?
-                    visibility >= 1000 ?
-                    `${(visibility / 1000).toFixed(1)} ${t('visibility_km')}` :
-                    `${visibility} ${t('visibility_m')}` :
-                    '--';
+                pressureValueEl.textContent = pressure !== undefined ? `${pressure} ${t('pressure_unit')}` : '--';
+                visibilityValueEl.textContent = visibility !== undefined && visibility >= 0 ? (visibility >= 1000 ? `${(visibility / 1000).toFixed(1)} ${t('visibility_km')}` : `${visibility} ${t('visibility_m')}`) : '--';
                 sunriseTimeEl.textContent = sunrise ? formatTime(sunrise, timezoneOffset) : '--';
                 sunsetTimeEl.textContent = sunset ? formatTime(sunset, timezoneOffset) : '--';
             }
 
             function renderHourlyForecast(forecastList, timezoneOffset) {
                 const todayDateStr = getLocalDateString(timezoneOffset);
-                let todayForecasts = forecastList.filter(entry => {
-                    const entryLocalDate = getLocalDateStringFromUTC(entry.dt, timezoneOffset);
-                    return entryLocalDate === todayDateStr;
-                });
+                let todayForecasts = forecastList.filter(entry => getLocalDateStringFromUTC(entry.dt, timezoneOffset) === todayDateStr);
                 if (todayForecasts.length < 4 && forecastList.length > 0) {
                     const nextDateStr = getLocalDateString(timezoneOffset, 1);
-                    const nextDayForecasts = forecastList.filter(entry => {
-                        const entryLocalDate = getLocalDateStringFromUTC(entry.dt, timezoneOffset);
-                        return entryLocalDate === nextDateStr;
-                    });
-                    todayForecasts = [...todayForecasts, ...nextDayForecasts].slice(0, 8);
-                } else {
-                    todayForecasts = todayForecasts.slice(0, 8);
-                }
-                if (todayForecasts.length === 0 && forecastList.length > 0) {
-                    todayForecasts = forecastList.slice(0, 8);
-                }
+                    const nextDay = forecastList.filter(entry => getLocalDateStringFromUTC(entry.dt, timezoneOffset) === nextDateStr);
+                    todayForecasts = [...todayForecasts, ...nextDay].slice(0, 8);
+                } else todayForecasts = todayForecasts.slice(0, 8);
+                if (todayForecasts.length === 0 && forecastList.length > 0) todayForecasts = forecastList.slice(0, 8);
                 const nowLocalHour = getLocalHour(timezoneOffset);
                 hourlyForecastEl.innerHTML = '';
                 todayForecasts.forEach((entry, index) => {
@@ -1304,17 +1002,12 @@
                     const entryTemp = Math.round(entry.main?.temp);
                     const entryHumidity = entry.main?.humidity;
                     const entryWeatherId = entry.weather[0]?.id || 800;
-                    const entryEmoji = getWeatherEmojiSimple(entryWeatherId);
                     const card = document.createElement('div');
                     card.className = 'hourly-card' + (isNow ? ' now' : '');
-                    let badgeHTML = '';
-                    if (isNow) {
-                        badgeHTML = `<span class="badge-now">${t('now_badge')}</span>`;
-                    }
                     card.innerHTML = `
-                        ${badgeHTML}
+                        ${isNow ? `<span class="badge-now">${t('now_badge')}</span>` : ''}
                         <div class="hourly-time">${timeStr}</div>
-                        <div class="hourly-icon">${entryEmoji}</div>
+                        <div class="hourly-icon">${getWeatherEmojiSimple(entryWeatherId)}</div>
                         <div class="hourly-temp">${entryTemp}°</div>
                         <div class="hourly-humidity">💧 ${entryHumidity}%</div>
                     `;
@@ -1322,10 +1015,7 @@
                 });
                 setTimeout(() => {
                     const nowCard = hourlyForecastEl.querySelector('.hourly-card.now');
-                    if (nowCard) {
-                        nowCard.scrollIntoView({ behavior: 'smooth', block: 'nearest',
-                            inline: 'center' });
-                    }
+                    if (nowCard) nowCard.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
                 }, 300);
             }
 
@@ -1338,7 +1028,6 @@
                 const d = String(localDate.getUTCDate()).padStart(2, '0');
                 return `${y}-${m}-${d}`;
             }
-
             function getLocalDateStringFromUTC(utcTimestamp, timezoneOffset) {
                 const localTimestamp = (utcTimestamp + timezoneOffset) * 1000;
                 const localDate = new Date(localTimestamp);
@@ -1347,18 +1036,14 @@
                 const d = String(localDate.getUTCDate()).padStart(2, '0');
                 return `${y}-${m}-${d}`;
             }
-
             function getLocalHour(timezoneOffset) {
                 const now = new Date();
                 const localTimestamp = now.getTime() + (timezoneOffset * 1000);
-                const localDate = new Date(localTimestamp);
-                return localDate.getUTCHours();
+                return new Date(localTimestamp).getUTCHours();
             }
-
             function getLocalHourFromUTC(utcTimestamp, timezoneOffset) {
                 const localTimestamp = (utcTimestamp + timezoneOffset) * 1000;
-                const localDate = new Date(localTimestamp);
-                return localDate.getUTCHours();
+                return new Date(localTimestamp).getUTCHours();
             }
 
             // ============ Event Listeners ============
@@ -1369,14 +1054,9 @@
                 if (query.length > 0) {
                     if (isCoordinates(query)) {
                         const coords = parseCoordinates(query);
-                        if (coords) {
-                            fetchWeatherByCoords(coords.lat, coords.lon, query);
-                        } else {
-                            showError('error_coords_invalid');
-                        }
-                    } else {
-                        fetchWeatherByCity(query);
-                    }
+                        if (coords) fetchWeatherByCoords(coords.lat, coords.lon, query);
+                        else showError('error_coords_invalid');
+                    } else fetchWeatherByCity(query);
                 } else {
                     searchInput.focus();
                     searchInput.style.borderColor = '#e74c3c';
@@ -1397,20 +1077,14 @@
                     if (query.length > 0) {
                         if (isCoordinates(query)) {
                             const coords = parseCoordinates(query);
-                            if (coords) {
-                                fetchWeatherByCoords(coords.lat, coords.lon, query);
-                            } else {
-                                showError('error_coords_invalid');
-                            }
-                        } else {
-                            fetchWeatherByCity(query);
-                        }
+                            if (coords) fetchWeatherByCoords(coords.lat, coords.lon, query);
+                            else showError('error_coords_invalid');
+                        } else fetchWeatherByCity(query);
                     }
                 } else if (e.key === 'ArrowDown') {
                     e.preventDefault();
                     if (currentSuggestions.length > 0) {
-                        selectedSuggestionIndex = Math.min(selectedSuggestionIndex + 1, currentSuggestions
-                            .length - 1);
+                        selectedSuggestionIndex = Math.min(selectedSuggestionIndex + 1, currentSuggestions.length - 1);
                         updateSuggestionHighlight();
                     }
                 } else if (e.key === 'ArrowUp') {
@@ -1434,23 +1108,15 @@
                     return;
                 }
                 if (suggestionTimeout) clearTimeout(suggestionTimeout);
-                if (query.length >= 2) {
-                    suggestionTimeout = setTimeout(() => fetchSuggestions(query), 350);
-                } else {
-                    suggestionsDropdown.classList.remove('active');
-                    currentSuggestions = [];
-                }
+                if (query.length >= 2) suggestionTimeout = setTimeout(() => fetchSuggestions(query), 350);
+                else { suggestionsDropdown.classList.remove('active'); currentSuggestions = []; }
             });
 
             function updateSuggestionHighlight() {
                 const items = suggestionsDropdown.querySelectorAll('.suggestion-item');
                 items.forEach((item, index) => {
-                    if (index === selectedSuggestionIndex) {
-                        item.classList.add('selected');
-                        item.scrollIntoView({ block: 'nearest' });
-                    } else {
-                        item.classList.remove('selected');
-                    }
+                    if (index === selectedSuggestionIndex) { item.classList.add('selected'); item.scrollIntoView({ block: 'nearest' }); }
+                    else item.classList.remove('selected');
                 });
             }
 
@@ -1476,19 +1142,35 @@
                         (error) => {
                             hideLoading();
                             let errorKey = 'error_geolocation_general';
-                            if (error.code === error.PERMISSION_DENIED) errorKey =
-                                'error_geolocation_denied';
-                            else if (error.code === error.TIMEOUT) errorKey =
-                            'error_geolocation_timeout';
+                            if (error.code === error.PERMISSION_DENIED) errorKey = 'error_geolocation_denied';
+                            else if (error.code === error.TIMEOUT) errorKey = 'error_geolocation_timeout';
                             showError(errorKey);
                         }, { timeout: 10000, enableHighAccuracy: true }
                     );
-                } else {
-                    showError('error_geolocation_not_supported');
+                } else showError('error_geolocation_not_supported');
+            });
+
+            // ============ Anti-copy ============
+            document.addEventListener('keydown', (e) => {
+                if (e.ctrlKey && (e.key === 'c' || e.key === 'x' || e.key === 'u' || e.key === 's' || e.key === 'a')) {
+                    e.preventDefault();
+                    return false;
+                }
+                if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) {
+                    e.preventDefault();
+                    return false;
+                }
+                if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && e.key === 'I')) {
+                    e.preventDefault();
+                    return false;
                 }
             });
 
-            // ============ Particle Network Background ============
+            document.addEventListener('copy', (e) => { e.preventDefault(); return false; });
+            document.addEventListener('cut', (e) => { e.preventDefault(); return false; });
+            document.addEventListener('contextmenu', (e) => { e.preventDefault(); return false; });
+
+            // ============ Particle Background ============
             const canvas = document.getElementById('particleCanvas');
             const ctx = canvas.getContext('2d');
             let particles = [];
@@ -1496,10 +1178,7 @@
             const connectionDistance = 120;
             const particleSpeed = 0.3;
 
-            function resizeCanvas() {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-            }
+            function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
             window.addEventListener('resize', resizeCanvas);
             resizeCanvas();
 
@@ -1524,12 +1203,9 @@
                     ctx.fill();
                 }
             }
-
             function initParticles() {
                 particles = [];
-                for (let i = 0; i < maxParticles; i++) {
-                    particles.push(new Particle());
-                }
+                for (let i = 0; i < maxParticles; i++) particles.push(new Particle());
             }
             initParticles();
 
@@ -1543,27 +1219,22 @@
                             ctx.beginPath();
                             ctx.moveTo(particles[i].x, particles[i].y);
                             ctx.lineTo(particles[j].x, particles[j].y);
-                            ctx.strokeStyle =
-                                `rgba(255, 255, 255, ${0.15 * (1 - dist / connectionDistance)})`;
+                            ctx.strokeStyle = `rgba(255, 255, 255, ${0.15 * (1 - dist / connectionDistance)})`;
                             ctx.lineWidth = 0.7;
                             ctx.stroke();
                         }
                     }
                 }
             }
-
             function animate() {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-                particles.forEach(p => {
-                    p.update();
-                    p.draw();
-                });
+                particles.forEach(p => { p.update(); p.draw(); });
                 drawLines();
                 requestAnimationFrame(animate);
             }
             animate();
 
-            // ============ Initial State ============
+            // ============ Initial ============
             hideLoading();
             hideError();
             weatherContainer.classList.remove('active');
@@ -1577,9 +1248,7 @@
                         const locationName = await reverseGeocode(lat, lon);
                         fetchWeatherByCoords(lat, lon, locationName);
                     },
-                    () => {
-                        console.log('Geolocation not available on load.');
-                    }, { timeout: 6000, enableHighAccuracy: false }
+                    () => {}, { timeout: 6000, enableHighAccuracy: false }
                 );
             }
         })();
